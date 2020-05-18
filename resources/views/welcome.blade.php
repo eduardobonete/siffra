@@ -1,100 +1,81 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+  <title>Messages</title>
+</head>
+<body>
+  <div id="app">
+    <div v-if="token != null">
+      <h1>Messages:</h1>
+      <input type="text" v-model="message.message">
+      <button @click="sendMessage()">Enviar</button>
+      <ul>
+        <li v-for="message in messages">
+          @{{ message.message }}
+        </li>
+      </ul>
+    </div>
+    <div v-if="token == null">
+      <h4> Usuários para teste </h4>
+      <p> <b>Email: </b> user1@siffra.com.br <b>senha: </b> 123456 </p>
+      <p> <b>Email: </b> user2@siffra.com.br <b>senha: </b> 123456 </p>
+      <hr>
+      Email: <input type="text" v-model="auth.username"><br><br>
+      Senha:<input type="password" v-model="auth.password"><br><br>
+      <button @click="login()">Login</button>
+    </div>
+  </div>
 
-        <title>Laravel</title>
+  <script src="https://js.pusher.com/6.0/pusher.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
 
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
+    var pusher = new Pusher('8acae47b14cd6acea139', {
+      cluster: 'us2'
+    });
 
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Nunito', sans-serif;
-                font-weight: 200;
-                height: 100vh;
-                margin: 0;
-            }
+    var channel = pusher.subscribe('my-channel');
+    channel.bind('my-event', function(data) {
+      app.messages.push(data);
+    });
 
-            .full-height {
-                height: 100vh;
-            }
-
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 13px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @auth
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ route('login') }}">Login</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}">Register</a>
-                        @endif
-                    @endauth
-                </div>
-            @endif
-
-            <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
-
-                <div class="links">
-                    <a href="https://laravel.com/docs">Docs</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://blog.laravel.com">Blog</a>
-                    <a href="https://nova.laravel.com">Nova</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://vapor.laravel.com">Vapor</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>
+    // Vue application
+    const app = new Vue({
+      el: '#app',
+      data: {
+        messages: [],
+        message: {
+          message: null,
+        },
+        token: null,
+        auth: {
+          username: null,
+          password: null,
+          scope: "*",
+          client_secret: "DSoYJ5nADN27HRl7ZblIzcYkBZ6DuwtGWW4UxS9z",
+          client_id: 2,
+          grant_type: "password"
+        }
+      },
+      methods: {
+        sendMessage() {
+          var self = this;
+          axios.post('/api/v1/message', 
+            this.message, 
+            {headers: { Authorization: "Bearer " + this.token}})
+            .then(function(res) {
+              self.message.message = null;
+          })
+        },
+        login() {
+          var self = this;
+          axios.post('oauth/token', this.auth).then(function(res) {
+            console.log(res)
+            self.token = res.data.access_token;
+          })
+        }
+      }
+    });
+  </script>
+</body>

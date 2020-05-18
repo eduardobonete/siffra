@@ -22,4 +22,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::group(['prefix'=> 'v1', 'namespace' => 'V1', 'middleware' => 'auth:api'], function() {
 
 	Route::apiResource('user', 'UserController');
+	Route::post('message', 'MessageController@send');
 });
