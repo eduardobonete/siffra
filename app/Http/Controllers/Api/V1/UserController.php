@@ -29,14 +29,19 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $user = User::create([
-            "name" => $request->name,
-            "email" => $request->email,
-            "password" => Hash::make($request->password)
-        ]);
-        SendUserEmail::dispatch($user);
+        try{
+            $user = User::create([
+                "name" => $request->name,
+                "email" => $request->email,
+                "password" => Hash::make($request->password)
+            ]);
+            SendUserEmail::dispatch($user);
 
-        return response()->json(['message' => 'Usuário criado com id '.$user->id], 200);
+            return response()->json(['message' => 'Usuário criado com id '.$user->id], 200);
+        }catch(Exception $e) {
+            return response()->json(['message'=> 'Falha ao salvar usuário'. $e->getMessage()], 500);
+        }
+            
     }
 
     /**
@@ -47,7 +52,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        return User::where('id', $id)->first();
     }
 
     /**
@@ -57,9 +62,18 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UserRequest $request, $id)
     {
-        //
+        try{
+            $user = User::where('id', $id)
+                ->update(
+                    $request->all()
+            );
+            return response()->json(['message'=> 'Usuário alterado com sucesso'], 200);
+        } catch(Exception $e) {
+            return response()->json(['message'=> 'Falha ao salvar usuário'. $e->getMessage()], 500);
+        }
+            
     }
 
     /**
