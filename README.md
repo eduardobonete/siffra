@@ -76,3 +76,32 @@ Basta acessar https://mailtrap.io/ e se cadastrar, inserir o username e password
 ```bash
 php artisan serve
 ```
+
+###Pusher
+Em resources/views/welcome.blade.php, trocar o token de acesso ao pusher pelo cadastrado em:
+```bash
+    var pusher = new Pusher('8acae47b14cd6acea139', {
+      cluster: 'us2'
+    });
+```
+Alterar o .env com os dados do pusher.
+Rodar o comando:
+```bash
+    php artisan queue:listen
+```
+
+
+###Login
+Para usar o login, primeiro rodar o seeder  com o seguinte comando:
+```bash
+    php artisan db:seed
+```
+Na sequência, em resources/views/welcome.blade.php, alterar o valor de client_secret pelo valor da tabela oauth_clients
+
+
+###Email com horizon
+Rodar o seguinte comando para tarefas:
+```bash
+    php artisan queue:work
+```
+
