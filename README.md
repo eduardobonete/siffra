@@ -69,6 +69,9 @@ php artisan passport:install
 ```
 
 ## Usage
+Para esta aplicação, foi utilizado o serviso mailtrap para teste de envio de emails.
+Basta acessar https://mailtrap.io/ e se cadastrar, inserir o username e password gerado para teste no arquivo .env
+
 
 ```bash
 php artisan serve
